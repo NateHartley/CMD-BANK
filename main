@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+from pathlib import Path
+from subprocess import run
+import pyperclip
+
+def list_commands():
+    cmd_list = list(Path('cmddir').iterdir())
+    # TODO: check cmddir exists, if not create it
+
+    lst2 = []
+    for i in range(0, len(cmd_list)):
+        cmd_file = str(cmd_list[i])
+        slash_index = cmd_file.find("/")
+        dot_index = cmd_file.find(".")
+
+        lst = []
+        for j in range(slash_index+1, dot_index):
+            lst.append(cmd_file[j])
+        
+        file_name = "".join(lst)
+        lst2.append(file_name)
+        print("["+str(i+1)+"]", file_name)
+
+    return lst2
+    
+
+def ui_menu(stored_commands):
+    print("\n[a] add\n[e] edit\n[d] delete")
+    usr_input = input("\n> ")
+    print("\n")
+
+    try:
+        view(stored_commands, usr_input)
+    except:
+        match usr_input:
+            case "a":
+                add(stored_commands)
+            case "e":
+                edit(stored_commands)
+            case "d":
+                delete(stored_commands)
+            case _:
+                print("Error - Invalid input")
+
+
+def add(stored_commands):
+    cmd = input("\nEnter name of command to add: ")
+
+    if cmd in stored_commands:
+        print("This command already exists.")
+    else:
+        cmd_file = cmd + ".txt"
+        path = Path.cwd().joinpath('cmddir', cmd_file)
+        open(path, "x")
+        print(cmd, "has been added")
+
+
+def delete(stored_commands):
+    cmd = input("\nEnter name of command to delete: ")
+
+    if cmd in stored_commands:
+        cmd_file = cmd + ".txt"
+        path = Path.cwd().joinpath('cmddir', cmd_file)
+        path.unlink()
+    else:
+        print("This command does not exist.")
+
+
+def edit(stored_commands):
+    cmd = input("\nEnter name of command to edit: ")
+    if cmd in stored_commands:
+        cmd_file = cmd + ".txt"
+        path = Path.cwd().joinpath('cmddir', cmd_file)
+        run(["nano", path])
+    else:
+        print("This command does not exist.")
+
+
+def view(stored_commands, usr_input):
+    cmd_num = int(usr_input)
+    #TODO: entering 0 should be invalid
+
+    cmd_file = stored_commands[cmd_num-1] + ".txt"
+    cmd_path = Path.cwd().joinpath('cmddir', cmd_file)
+
+    # Format contents of command file to .READCMD
+    cmd_num = 0
+    with open(".READCMD", "w") as f1:
+        with open(cmd_path, "r") as f2:
+            
+            for l in f2:
+                if l[0] == "#":
+                    cmd_num += 1
+                    print("[%d]" % cmd_num)
+                    f1.write("%d\n" % cmd_num)
+                    print(l[1:].strip())
+                else:
+                    print(l.strip())
+                    f1.write(l.strip() + "\n")
+
+        cmd_choice = input("\nWhich command do you want to use: ")
+        
+    select = False
+    with open(".READCMD", "r") as f1:
+        for l in f1:
+            if select:
+                select = False
+                saved = l.strip()
+
+            if l.strip() == cmd_choice:
+                select = True
+            else:
+                pass
+                #TODO: Only accept numbers from .READCMD e.g. reject 54637289 or "asdf"
+
+    print("\nCommand has been copied to you clipboard!")
+    pyperclip.copy(saved)
+    
+    #TODO: paste selected command into shell input
+
+
+def main():
+    stored_commands = list_commands()
+    ui_menu(stored_commands)
+
+    cmddir_path = Path('cmddir') / 'nmap.txt'
+
+    file_exists = cmddir_path.is_file()
+
+    if file_exists:
+        pass
+    else:
+        print("File does not exists")
+    
+
+if __name__ == "__main__":
+    main()
