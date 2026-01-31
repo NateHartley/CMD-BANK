@@ -3,6 +3,13 @@ from pathlib import Path
 from subprocess import run
 import pyperclip
 
+from rich import print
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.columns import Columns
+from rich.text import Text
+
 def list_commands():
     cmd_list = list(Path('cmddir').iterdir())
     # TODO: check cmddir exists, if not create it
@@ -19,30 +26,50 @@ def list_commands():
         
         file_name = "".join(lst)
         lst2.append(file_name)
-        print("["+str(i+1)+"]", file_name)
+
+    lst2 = sorted(lst2) # Sort list alphabetically
 
     return lst2
-    
 
-def ui_menu(stored_commands):
-    print("\n[a] add\n[e] edit\n[d] delete\n[q] quit")
-    usr_input = input("\n> ")
-    print("\n")
 
-    try:
-        view(stored_commands, usr_input)
-    except:
-        match usr_input:
-            case "a":
-                add(stored_commands)
-            case "e":
-                edit(stored_commands)
-            case "d":
-                delete(stored_commands)
-            case "q":
-                return
-            case _:
-                print("Error - Invalid input")
+def render_main_menu(stored_commands):
+    console = Console()
+
+    # View Saved Commands column
+    table1 = Table(show_header=False, box=None, pad_edge=False)
+    table1.add_column("No.", style="green", width=1, justify="right")
+    table1.add_column("Option", style="cyan")
+
+    for i, opt in enumerate(stored_commands, start=1):
+        table1.add_row(str(i)+")", opt)
+
+    # Menu Options column
+    table2 = Table(show_header=False, box=None, pad_edge=False)
+    table2.add_column("Option")
+    table2.add_row("[green]a)[/green] add")
+    table2.add_row("[green]e)[/green] edit")
+    table2.add_row("[green]d)[/green] delete")
+    table2.add_row("[green]q)[/green] quit")
+
+    # Panels inside of main box
+    columns = Columns(
+        [
+            Panel(table1, title="View Saved Commands", padding=(1,4)), # Don't set to white bc of light theme
+            Panel(table2, title="Menu Options", padding=(1,4)),
+        ],
+        equal=False,
+        expand=True,
+    )
+
+    # Main box
+    console.print(
+        Panel(
+            columns,
+            title="[bold]CMD-BANK[/bold]",
+            border_style="green",
+            padding=(0, 1),
+        )
+    )
 
 
 def add(stored_commands):
@@ -79,10 +106,15 @@ def edit(stored_commands):
 
 
 def view(stored_commands, usr_input):
+    console = Console()
+    text = Text()
+
     cmd_num = int(usr_input)
     #TODO: entering 0 should be invalid
 
-    cmd_file = stored_commands[cmd_num-1] + ".txt"
+    selected_cmd = stored_commands[cmd_num-1]
+
+    cmd_file = selected_cmd + ".txt"
     cmd_path = Path.cwd().joinpath('cmddir', cmd_file)
 
     # Format contents of command file to .READCMD
@@ -91,19 +123,44 @@ def view(stored_commands, usr_input):
         with open(cmd_path, "r") as f2:
             
             for l in f2:
-                if l[0] == "#":
-                    cmd_num += 1
-                    print("[%d]" % cmd_num)
-                    f1.write("%d\n" % cmd_num)
-                    print(l[1:].strip())
-                else:
-                    print(l.strip())
-                    f1.write(l.strip() + "\n")
 
-        cmd_choice = input("\nWhich command do you want to use: ")
+                # If reading the info line
+                if l[0] == "#":
+                    info = l[1:].strip()
+                    text.append("\n"+info, style="lightgrey")
+
+                # If reading the command line
+                else:
+
+                    # If line is blank (space between two commands)
+                    if l.strip() == "":
+                        text.append("\n\n")
+                    else:
+                        cmd_num += 1
+                        number = "["+str(cmd_num)+"]"
+
+                        f1.write("%d\n" % cmd_num)
+                        f1.write(l.strip() + "\n")
+
+                        command = l.strip()
+                        text.append(number, style="yellow")
+                        text.append(" ")
+                        text.append(command, style="cyan")
+
+        console.print(
+            Panel(
+                text,
+                title="[bold]"+selected_cmd+"[/bold]",
+                border_style="green",
+            )
+        )
+
+        cmd_choice = input("\n> ")
         
     select = False
     with open(".READCMD", "r") as f1:
+
+        # Iterates through all lines in .READCMD
         for l in f1:
             if select:
                 select = False
@@ -119,6 +176,27 @@ def view(stored_commands, usr_input):
     pyperclip.copy(saved_cmd)
     
     #TODO: paste selected command into shell input
+
+
+def ui_menu(stored_commands):
+    render_main_menu(stored_commands)
+    usr_input = input("\n> ")
+    print("")
+
+    try:
+        view(stored_commands, usr_input)
+    except:
+        match usr_input:
+            case "a":
+                add(stored_commands)
+            case "e":
+                edit(stored_commands)
+            case "d":
+                delete(stored_commands)
+            case "q":
+                return
+            case _:
+                print("Error - Invalid input")
 
 
 def main():
