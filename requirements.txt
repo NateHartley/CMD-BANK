@@ -1,0 +1,5 @@
+pyperclip
+markdown-it-py
+mdurl
+pygments
+rich
