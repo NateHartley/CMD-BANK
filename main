@@ -73,7 +73,8 @@ def render_main_menu(stored_commands):
 
 
 def add(stored_commands):
-    cmd = input("\nEnter name of command to add: ")
+    print("Enter name of command to add:")
+    cmd = input("> ")
 
     if cmd in stored_commands:
         print("This command already exists.")
@@ -83,9 +84,27 @@ def add(stored_commands):
         open(path, "x")
         print(cmd, "has been added")
 
+    main()
+    return
+
+
+def edit(stored_commands):
+    print("Enter name of command to edit:")
+    cmd = input("> ")
+    if cmd in stored_commands:
+        cmd_file = cmd + ".txt"
+        path = Path.cwd().joinpath('cmddir', cmd_file)
+        run(["nano", path])
+    else:
+        print("This command does not exist.")
+
+    main()
+    return
+
 
 def delete(stored_commands):
-    cmd = input("\nEnter name of command to delete: ")
+    print("Enter name of command to delete:")
+    cmd = input("> ")
 
     if cmd in stored_commands:
         cmd_file = cmd + ".txt"
@@ -94,15 +113,8 @@ def delete(stored_commands):
     else:
         print("This command does not exist.")
 
-
-def edit(stored_commands):
-    cmd = input("\nEnter name of command to edit: ")
-    if cmd in stored_commands:
-        cmd_file = cmd + ".txt"
-        path = Path.cwd().joinpath('cmddir', cmd_file)
-        run(["nano", path])
-    else:
-        print("This command does not exist.")
+    main()
+    return
 
 
 def view(stored_commands, usr_input):
@@ -127,7 +139,7 @@ def view(stored_commands, usr_input):
                 # If reading the info line
                 if l[0] == "#":
                     info = l[1:].strip()
-                    text.append("\n"+info, style="lightgrey")
+                    text.append("\n"+info, style="italic")
 
                 # If reading the command line
                 else:
@@ -146,6 +158,12 @@ def view(stored_commands, usr_input):
                         text.append(number, style="yellow")
                         text.append(" ")
                         text.append(command, style="cyan")
+        #TODO: Fix when there are no comments in a command file, still allow for new lines between the commands e.g. in ssh file
+
+        # Back option
+        text.append("\n\nb)", style="green")
+        text.append(" ")
+        text.append("back", style="white")
 
         console.print(
             Panel(
@@ -155,7 +173,12 @@ def view(stored_commands, usr_input):
             )
         )
 
-        cmd_choice = input("\n> ")
+    cmd_choice = input("\n> ")
+
+    # Return to main menu if back option is selected
+    if cmd_choice == "b":
+        main()
+        return # Kills old view() instance
         
     select = False
     with open(".READCMD", "r") as f1:
@@ -172,10 +195,8 @@ def view(stored_commands, usr_input):
                 pass
                 #TODO: Only accept numbers from .READCMD e.g. reject 54637289 or "asdf"
 
-    print("\nCommand has been copied to you clipboard!")
-    pyperclip.copy(saved_cmd)
-    
-    #TODO: paste selected command into shell input
+        print("\nCommand has been copied to you clipboard!")
+        pyperclip.copy(saved_cmd)
 
 
 def ui_menu(stored_commands):
@@ -197,6 +218,7 @@ def ui_menu(stored_commands):
                 return
             case _:
                 print("Error - Invalid input")
+            #TODO: Add settings options for theme etc.
 
 
 def main():
