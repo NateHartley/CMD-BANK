@@ -25,7 +25,7 @@ def list_commands():
     
 
 def ui_menu(stored_commands):
-    print("\n[a] add\n[e] edit\n[d] delete")
+    print("\n[a] add\n[e] edit\n[d] delete\n[q] quit")
     usr_input = input("\n> ")
     print("\n")
 
@@ -39,6 +39,8 @@ def ui_menu(stored_commands):
                 edit(stored_commands)
             case "d":
                 delete(stored_commands)
+            case "q":
+                return
             case _:
                 print("Error - Invalid input")
 
@@ -105,7 +107,7 @@ def view(stored_commands, usr_input):
         for l in f1:
             if select:
                 select = False
-                saved = l.strip()
+                saved_cmd = l.strip()
 
             if l.strip() == cmd_choice:
                 select = True
@@ -114,7 +116,7 @@ def view(stored_commands, usr_input):
                 #TODO: Only accept numbers from .READCMD e.g. reject 54637289 or "asdf"
 
     print("\nCommand has been copied to you clipboard!")
-    pyperclip.copy(saved)
+    pyperclip.copy(saved_cmd)
     
     #TODO: paste selected command into shell input
 
