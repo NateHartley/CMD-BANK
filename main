@@ -2,6 +2,7 @@
 from pathlib import Path
 from subprocess import run
 import pyperclip
+import sys
 
 from rich import print
 from rich.console import Console
@@ -10,9 +11,14 @@ from rich.table import Table
 from rich.columns import Columns
 from rich.text import Text
 
+def check_cmddir():
+    # Create cmddir directory if it doesn't exist
+    if not Path('cmddir').is_dir():
+        Path('cmddir').mkdir(parents=False, exist_ok=True)
+        
+
 def list_commands():
     cmd_list = list(Path('cmddir').iterdir())
-    # TODO: check cmddir exists, if not create it
 
     lst2 = []
     for i in range(0, len(cmd_list)):
@@ -40,8 +46,11 @@ def render_main_menu(stored_commands):
     table1.add_column("No.", style="green", width=1, justify="right")
     table1.add_column("Option", style="cyan")
 
-    for i, opt in enumerate(stored_commands, start=1):
-        table1.add_row(str(i)+")", opt)
+    if not stored_commands:
+        table1.add_row("", "[red](Directory is empty)[/red]")
+    else:
+        for i, opt in enumerate(stored_commands, start=1):
+            table1.add_row(str(i)+")", opt)
 
     # Menu Options column
     table2 = Table(show_header=False, box=None, pad_edge=False)
@@ -73,11 +82,11 @@ def render_main_menu(stored_commands):
 
 
 def add(stored_commands):
-    print("Enter name of command to add:")
+    print("Enter the name of a file to add:")
     cmd = input("> ")
 
     if cmd in stored_commands:
-        print("This command already exists.")
+        print("This file already exists.")
     else:
         cmd_file = cmd + ".txt"
         path = Path.cwd().joinpath('cmddir', cmd_file)
@@ -89,21 +98,21 @@ def add(stored_commands):
 
 
 def edit(stored_commands):
-    print("Enter name of command to edit:")
+    print("Enter the name of a file to edit:")
     cmd = input("> ")
     if cmd in stored_commands:
         cmd_file = cmd + ".txt"
         path = Path.cwd().joinpath('cmddir', cmd_file)
         run(["nano", path])
     else:
-        print("This command does not exist.")
+        print("This file does not exist.")
 
     main()
     return
 
 
 def delete(stored_commands):
-    print("Enter name of command to delete:")
+    print("Enter the name of a file to delete:")
     cmd = input("> ")
 
     if cmd in stored_commands:
@@ -111,7 +120,7 @@ def delete(stored_commands):
         path = Path.cwd().joinpath('cmddir', cmd_file)
         path.unlink()
     else:
-        print("This command does not exist.")
+        print("This file does not exist.")
 
     main()
     return
@@ -215,24 +224,21 @@ def ui_menu(stored_commands):
             case "d":
                 delete(stored_commands)
             case "q":
-                return
+                sys.exit()
             case _:
-                print("Error - Invalid input")
+                print("Error - Invalid input") #TODO: Fix this so it doesn't print more than once when switching between menus
             #TODO: Add settings options for theme etc.
 
 
 def main():
+    check_cmddir()
     stored_commands = list_commands()
-    ui_menu(stored_commands)
 
-    cmddir_path = Path('cmddir') / 'nmap.txt'
-
-    file_exists = cmddir_path.is_file()
-
-    if file_exists:
-        pass
-    else:
-        print("File does not exists")
+    try:
+        ui_menu(stored_commands)
+    except KeyboardInterrupt:
+        print("\n[red]Keyboard Interrupt - No command saved to clipboard[/red]")
+        sys.exit()
     
 
 if __name__ == "__main__":
