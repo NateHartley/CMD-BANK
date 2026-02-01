@@ -190,7 +190,7 @@ def view(stored_commands, usr_input):
             except:
                 print("[red]ERROR - Could not read[/red]", cmd_path)
     except:
-        print("[red]ERROR - Could not read .CMDREAD[/red]")
+        print("[red]ERROR - Could not read .READCMD[/red]")
         return False
 
     cmd_choice = input("\n> ")
