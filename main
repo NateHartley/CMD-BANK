@@ -43,7 +43,7 @@ def render_main_menu(stored_commands):
 
     # View Saved Commands column
     table1 = Table(show_header=False, box=None, pad_edge=False)
-    table1.add_column("No.", style="green", width=1, justify="right")
+    table1.add_column("No.", style="green", width=2, justify="right")
     table1.add_column("Option", style="cyan")
 
     if not stored_commands:
