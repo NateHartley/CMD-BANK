@@ -86,15 +86,12 @@ def add(stored_commands):
     cmd = input("> ")
 
     if cmd in stored_commands:
-        print("This file already exists.")
+        print("[red]ERROR - This file already exists[/red]")
     else:
         cmd_file = cmd + ".txt"
         path = Path.cwd().joinpath('cmddir', cmd_file)
         open(path, "x")
         print(cmd, "has been added")
-
-    main()
-    return
 
 
 def edit(stored_commands):
@@ -105,10 +102,7 @@ def edit(stored_commands):
         path = Path.cwd().joinpath('cmddir', cmd_file)
         run(["nano", path])
     else:
-        print("This file does not exist.")
-
-    main()
-    return
+        print("[red]ERROR - This file does not exist[/red]")
 
 
 def delete(stored_commands):
@@ -120,10 +114,7 @@ def delete(stored_commands):
         path = Path.cwd().joinpath('cmddir', cmd_file)
         path.unlink()
     else:
-        print("This file does not exist.")
-
-    main()
-    return
+        print("[red]ERROR - This file does not exist[/red]")
 
 
 def view(stored_commands, usr_input):
@@ -142,31 +133,34 @@ def view(stored_commands, usr_input):
     cmd_num = 0
     with open(".READCMD", "w") as f1:
         with open(cmd_path, "r") as f2:
-            
-            for l in f2:
 
-                # If reading the info line
-                if l[0] == "#":
-                    info = l[1:].strip()
-                    text.append("\n"+info, style="italic")
+            if cmd_path.stat().st_size == 0:
+                text.append("(File is empty)", style="red")
+            else:
+                for l in f2:
 
-                # If reading the command line
-                else:
+                    # If reading the info line
+                    if l[0] == "#":
+                        info = l[1:].strip()
+                        text.append("\n"+info, style="italic")
 
-                    # If line is blank (space between two commands)
-                    if l.strip() == "":
-                        text.append("\n\n")
+                    # If reading the command line
                     else:
-                        cmd_num += 1
-                        number = "["+str(cmd_num)+"]"
 
-                        f1.write("%d\n" % cmd_num)
-                        f1.write(l.strip() + "\n")
+                        # If line is blank (space between two commands)
+                        if l.strip() == "":
+                            text.append("\n\n")
+                        else:
+                            cmd_num += 1
+                            number = "["+str(cmd_num)+"]"
 
-                        command = l.strip()
-                        text.append(number, style="yellow")
-                        text.append(" ")
-                        text.append(command, style="cyan")
+                            f1.write("%d\n" % cmd_num)
+                            f1.write(l.strip() + "\n")
+
+                            command = l.strip()
+                            text.append(number, style="yellow")
+                            text.append(" ")
+                            text.append(command, style="cyan")
         #TODO: Fix when there are no comments in a command file, still allow for new lines between the commands e.g. in ssh file
 
         # Back option
@@ -186,8 +180,7 @@ def view(stored_commands, usr_input):
 
     # Return to main menu if back option is selected
     if cmd_choice == "b":
-        main()
-        return # Kills old view() instance
+        return True
         
     select = False
     with open(".READCMD", "r") as f1:
@@ -206,36 +199,42 @@ def view(stored_commands, usr_input):
 
         print("\nCommand has been copied to you clipboard!")
         pyperclip.copy(saved_cmd)
+        return False
 
 
-def ui_menu(stored_commands):
-    render_main_menu(stored_commands)
-    usr_input = input("\n> ")
-    print("")
+def ui_menu():
+    return_to_menu = True
+    while return_to_menu:
+        stored_commands = list_commands()
+        render_main_menu(stored_commands)
+        usr_input = input("\n> ")
+        print("")
 
-    try:
-        view(stored_commands, usr_input)
-    except:
-        match usr_input:
-            case "a":
-                add(stored_commands)
-            case "e":
-                edit(stored_commands)
-            case "d":
-                delete(stored_commands)
-            case "q":
-                sys.exit()
-            case _:
-                print("Error - Invalid input") #TODO: Fix this so it doesn't print more than once when switching between menus
-            #TODO: Add settings options for theme etc.
+        try:
+            return_to_menu = view(stored_commands, usr_input)
+        except KeyboardInterrupt:
+            print("\n[red]Keyboard Interrupt - No command saved to clipboard[/red]")
+            sys.exit()
+        except:
+            match usr_input:
+                case "a":
+                    add(stored_commands)
+                case "e":
+                    edit(stored_commands)
+                case "d":
+                    delete(stored_commands)
+                case "q":
+                    return_to_menu = False
+                case _:
+                    print("[red]Error - Invalid input[/red]")
+                #TODO: Add settings options for theme etc.
 
 
 def main():
     check_cmddir()
-    stored_commands = list_commands()
 
     try:
-        ui_menu(stored_commands)
+        ui_menu()
     except KeyboardInterrupt:
         print("\n[red]Keyboard Interrupt - No command saved to clipboard[/red]")
         sys.exit()
