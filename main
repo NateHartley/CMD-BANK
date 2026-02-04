@@ -3,6 +3,7 @@ from pathlib import Path
 from subprocess import run
 import pyperclip
 import sys
+import platform
 
 from rich import print
 from rich.console import Console
@@ -18,12 +19,23 @@ def check_cmddir():
         
 
 def list_commands():
+    return_to_menu = True
     cmd_list = list(Path('cmddir').iterdir())
 
     lst2 = []
     for i in range(0, len(cmd_list)):
+
         cmd_file = str(cmd_list[i])
-        slash_index = cmd_file.find("/")
+
+        machine_OS = platform.system()
+        if machine_OS == "Windows":
+            slash_index = cmd_file.find("\\")
+        elif machine_OS == "Linux" or machine_OS == "Darwin":
+            slash_index = cmd_file.find("/")
+        else:
+            print("[red]ERROR - Unsupported OS[/red]")
+            return_to_menu = False
+        
         dot_index = cmd_file.find(".")
 
         lst = []
@@ -35,7 +47,7 @@ def list_commands():
 
     lst2 = sorted(lst2) # Sort list alphabetically
 
-    return lst2
+    return lst2, return_to_menu
 
 
 def render_main_menu(stored_commands):
@@ -100,7 +112,10 @@ def edit(stored_commands):
     if cmd in stored_commands:
         cmd_file = cmd + ".txt"
         path = Path.cwd().joinpath('cmddir', cmd_file)
-        run(["nano", path])
+        if platform.system() == "Windows":
+            run(["edit", path])
+        if platform.system() == "Linux" or platform.system() == "Darwin":
+            run(["nano", path])
     else:
         print("[red]ERROR - This file does not exist[/red]")
 
@@ -222,7 +237,7 @@ def view(stored_commands, usr_input):
 def ui_menu():
     return_to_menu = True
     while return_to_menu:
-        stored_commands = list_commands()
+        stored_commands, return_to_menu = list_commands()
         render_main_menu(stored_commands)
         usr_input = input("\n> ")
         print("")
