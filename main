@@ -136,13 +136,25 @@ def view(s_c, u_i):
     console = Console()
     text = Text()
 
-    file_num = int(usr_input)
+    # If user input is an integer
+    try:
+        selection = int(usr_input)
 
-    # Do not set variables if file_num is 0
-    if file_num != 0:
-        selected_cmd = stored_commands[file_num-1]
-        cmd_file = selected_cmd + ".txt"
-        cmd_path = Path.cwd().joinpath('cmddir', cmd_file)
+        # Do not set variables if selection is 0
+        if selection != 0:
+            selected_cmd = stored_commands[selection-1]
+            cmd_file = selected_cmd + ".txt"
+            cmd_path = Path.cwd().joinpath('cmddir', cmd_file)
+
+    # If user input is a string
+    except ValueError:
+        i = 0
+        for i in stored_commands:
+            if i == usr_input:
+                selected_cmd = i
+                cmd_file = i + ".txt"
+                cmd_path = Path.cwd().joinpath('cmddir', cmd_file)
+                break
 
     # Format contents of command file to .READCMD
     cmd_num = 0
