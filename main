@@ -93,14 +93,25 @@ def render_main_menu(stored_commands):
 def add(stored_commands):
     print("Enter the name of a file to add:")
     cmd = input("> ")
+    invalid_char = ['.', ',', '/', '\\', ' ']
 
-    if cmd in stored_commands:
-        print("[red]ERROR - This file already exists[/red]")
+    if cmd.isnumeric() == False:
+        for i in cmd:
+            if i in invalid_char:
+                print("[red]ERROR - File name cannot include the following characters: . , / \\ (space)[/red]")
+                return
+        
+        if cmd in stored_commands:
+            print("[red]ERROR - This file already exists[/red]")
+        elif cmd == 'a' or cmd == 'e' or cmd == 'd' or cmd == 'q':
+            print("[red]ERROR - File cannot have the same name as a menu option[/red]")
+        else:
+            cmd_file = cmd + ".txt"
+            path = Path.cwd().joinpath('cmddir', cmd_file)
+            open(path, "x")
+            print(cmd, "has been added.")
     else:
-        cmd_file = cmd + ".txt"
-        path = Path.cwd().joinpath('cmddir', cmd_file)
-        open(path, "x")
-        print(cmd, "has been added")
+        print("[red]ERROR - File name cannot be an integer[/red]")
 
 
 def edit(stored_commands):
@@ -124,7 +135,12 @@ def delete(stored_commands):
     if cmd in stored_commands:
         cmd_file = cmd + ".txt"
         path = Path.cwd().joinpath('cmddir', cmd_file)
-        path.unlink()
+        print("Are you sure you want to delete", cmd,"? (y/n)")
+        confirm = input("> ").lower()
+        if confirm == 'y' or confirm == 'yes':
+            path.unlink()
+        else:
+            print("Delete cancelled...")
     else:
         print("[red]ERROR - This file does not exist[/red]")
 
