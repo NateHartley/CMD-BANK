@@ -140,8 +140,8 @@ def view(s_c, u_i):
     try:
         selection = int(usr_input)
 
-        # Do not set variables if selection is 0
-        if selection != 0:
+        # Error handling if user input is 0 or too high
+        if selection != 0 and selection <= len(stored_commands):
             selected_cmd = stored_commands[selection-1]
             cmd_file = selected_cmd + ".txt"
             cmd_path = Path.cwd().joinpath('cmddir', cmd_file)
@@ -264,6 +264,8 @@ def copy_command(s_c, u_i):
 
 def ui_menu():
     return_to_menu = True
+    menu_options = ['a', 'e', 'd', 'q']
+
     while return_to_menu:
         stored_commands, return_to_menu = list_commands()
         render_main_menu(stored_commands)
@@ -271,22 +273,21 @@ def ui_menu():
         print("")
 
         try:
-            return_to_menu = view(stored_commands, usr_input)
+            if usr_input in menu_options:
+                match usr_input:
+                    case "a":
+                        add(stored_commands)
+                    case "e":
+                        edit(stored_commands)
+                    case "d":
+                        delete(stored_commands)
+                    case "q":
+                        return_to_menu = False
+            else:
+                return_to_menu = view(stored_commands, usr_input)
         except KeyboardInterrupt:
             print("\n[red]Keyboard Interrupt - No command saved to clipboard[/red]")
             sys.exit()
-        except:
-            match usr_input:
-                case "a":
-                    add(stored_commands)
-                case "e":
-                    edit(stored_commands)
-                case "d":
-                    delete(stored_commands)
-                case "q":
-                    return_to_menu = False
-                case _:
-                    print("[red]ERROR - Invalid input. This is not a saved command, or a menu option. Please try again[/red]")
 
 
 def main():
