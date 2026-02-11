@@ -129,7 +129,10 @@ def delete(stored_commands):
         print("[red]ERROR - This file does not exist[/red]")
 
 
-def view(stored_commands, usr_input):
+def view(s_c, u_i):
+    stored_commands = s_c
+    usr_input = u_i
+
     console = Console()
     text = Text()
 
@@ -211,6 +214,12 @@ def view(stored_commands, usr_input):
     except:
         print("[red]ERROR - Could not read .READCMD[/red]")
         return False
+    
+    return copy_command(stored_commands, usr_input)
+    
+def copy_command(s_c, u_i):
+    stored_commands = s_c
+    usr_input = u_i
 
     cmd_choice = input("\n> ")
 
@@ -232,9 +241,13 @@ def view(stored_commands, usr_input):
             else:
                 pass
 
-        print("\nCommand has been copied to you clipboard!")
+    try:
         pyperclip.copy(saved_cmd)
+        print("Command has been copied to you clipboard!")
         return False
+    except:
+        print("[red]ERROR - Invalid input. This is not a saved command, or a menu option. Please try again[/red]")
+        return view(stored_commands, usr_input)
 
 
 def ui_menu():
@@ -261,7 +274,7 @@ def ui_menu():
                 case "q":
                     return_to_menu = False
                 case _:
-                    print(f"[red]ERROR - Invalid input. This is not a saved command, or a menu option. Please try again[/red]")
+                    print("[red]ERROR - Invalid input. This is not a saved command, or a menu option. Please try again[/red]")
 
 
 def main():
