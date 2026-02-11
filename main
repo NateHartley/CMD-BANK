@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 from subprocess import run
-import pyperclip
-import sys
-import platform
-
+import pyperclip, sys, platform
 from rich import print
 from rich.console import Console
 from rich.panel import Panel
@@ -133,15 +130,16 @@ def delete(stored_commands):
 
 
 def view(stored_commands, usr_input):
-    #TODO: usr_input cannot be 0 or any number above the max no. of command
-
     console = Console()
     text = Text()
 
-    cmd_num = int(usr_input)
-    selected_cmd = stored_commands[cmd_num-1]
-    cmd_file = selected_cmd + ".txt"
-    cmd_path = Path.cwd().joinpath('cmddir', cmd_file)
+    file_num = int(usr_input)
+
+    # Do not set variables if file_num is 0
+    if file_num != 0:
+        selected_cmd = stored_commands[file_num-1]
+        cmd_file = selected_cmd + ".txt"
+        cmd_path = Path.cwd().joinpath('cmddir', cmd_file)
 
     # Format contents of command file to .READCMD
     cmd_num = 0
@@ -202,8 +200,14 @@ def view(stored_commands, usr_input):
                         border_style="green",
                     )
                 )
+
+            # User inputted '0' therefore cmd_path is not set, triggering UnboundLocalError
+            except UnboundLocalError:
+                print(f"[red]ERROR - Invalid input. This is not a saved command, or a menu option. Please try again[/red]")
+                return True
             except:
                 print("[red]ERROR - Could not read[/red]", cmd_path)
+                return False
     except:
         print("[red]ERROR - Could not read .READCMD[/red]")
         return False
@@ -227,7 +231,6 @@ def view(stored_commands, usr_input):
                 select = True
             else:
                 pass
-                #TODO: Only accept numbers from .READCMD e.g. reject 54637289 or "asdf"
 
         print("\nCommand has been copied to you clipboard!")
         pyperclip.copy(saved_cmd)
@@ -258,8 +261,7 @@ def ui_menu():
                 case "q":
                     return_to_menu = False
                 case _:
-                    print("[red]Error - Invalid input[/red]")
-                #TODO: Add settings options for theme etc.
+                    print(f"[red]ERROR - Invalid input. This is not a saved command, or a menu option. Please try again[/red]")
 
 
 def main():
