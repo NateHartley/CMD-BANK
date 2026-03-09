@@ -2,11 +2,13 @@
 set -e  # exit if any command fails
 
 APP_NAME="cmdbank"
-BIN_DIR="$HOME/.local/bin/$APP_NAME"
+VERSION="CMD-BANK-1.0.0"
+BIN_DIR="$HOME/.local/bin"
 APP_DIR="$HOME/.local/share/$APP_NAME/app"
 DATA_DIR="$HOME/.local/share/$APP_NAME/data"
 CONFIG_DIR="$HOME/.config/$APP_NAME"
 CACHE_DIR="$HOME/.cache/$APP_NAME"
+DOWNLOADS_DIR="$HOME/Downloads"
 
 # Create dirs (-p flag to handle creating duplicate dirs)
 mkdir -p "$BIN_DIR" "$APP_DIR" "$DATA_DIR" "$CONFIG_DIR" "$CACHE_DIR"
@@ -16,36 +18,38 @@ TMP_DIR=$(mktemp -d)
 
 # Download release from GitHub
 echo "Downloading $APP_NAME release from GitHub..."
-curl -L https://github.com/NateHartley/CMD-BANK/releases/latest/download/$APP_NAME.tar.gz -o "$TMP_DIR/$APP_NAME.tar.gz"
+curl -L https://github.com/NateHartley/CMD-BANK/archive/refs/tags/v1.0.0.tar.gz -o "$DOWNLOADS_DIR/$APP_NAME.tar.gz"
+# curl -L https://github.com/NateHartley/CMD-BANK/releases/latest/download/$APP_NAME.tar.gz -o "$TMP_DIR/$APP_NAME.tar.gz"
 
 # Extract downloaded files
 echo "Extracting files..."
-tar -xzf "$TMP_DIR/$APP_NAME.tar.gz" -C "$TMP_DIR"
+tar -xzf "$DOWNLOADS_DIR/$APP_NAME.tar.gz" -C "$DOWNLOADS_DIR"
 
 # Copy source code file to app dir
 echo "Installing source files..."
-cp "$TMP_DIR/$APP_NAME-main/main" "$APP_DIR/"
+cp "$DOWNLOADS_DIR/$VERSION/main" "$APP_DIR/"
 
 # Copy requirements file to app dir, and install dependencies
 echo "Installing requirements file..."
-cp "$TMP_DIR/$APP_NAME-main/requirements.txt" "$APP_DIR/"
-python3 -m pip install --user -r "$APP_DIR/requirements.txt"
+cp "$DOWNLOADS_DIR/$VERSION/requirements.txt" "$APP_DIR/"
+python3 -m pip install -r "$APP_DIR/requirements.txt"
 
 # Copy temp file to cache dir
 echo "Installing temp file..."
-cp "$TMP_DIR/$APP_NAME-main/.READCMD" "$CACHE_DIR/"
+cp "$DOWNLOADS_DIR/$VERSION/.READCMD" "$CACHE_DIR/"
 
 # Create launcher in ~/.local/bin
 echo "Creating launcher..."
-cat << EOF > "$BIN_DIR"
+cat << EOF > "$BIN_DIR/$APP_NAME"
 #!/usr/bin/env bash
 python3 "\$HOME/.local/share/$APP_NAME/app/main" "\$@"
 EOF
 
-chmod +x "$BIN_DIR"
+chmod +x "$BIN_DIR/$APP_NAME"
 
-# Delete temp dir
-rm -rf "$TMP_DIR"
+# Delete files
+rm -rf "$DOWNLOADS_DIR/$VERSION"
+rm -f "$DOWNLOADS_DIR/$APP_NAME.tar.gz"
 
 echo "$APP_NAME installed successfully!"
 echo "Run app by typing: $APP_NAME"
