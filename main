@@ -8,43 +8,31 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.columns import Columns
 from rich.text import Text
+import os
 
-def check_cmddir():
-    # Create cmddir directory if it doesn't exist
-    if not Path('cmddir').is_dir():
-        Path('cmddir').mkdir(parents=False, exist_ok=True)
+APP_NAME = "cmdbank"
+HOME_DIR = os.path.expanduser("~")
+DATA_DIR = os.path.join(HOME_DIR, ".local", "share", APP_NAME, "data")
+CACHE_DIR = os.path.join(HOME_DIR, ".cache", APP_NAME)
+READCMD = os.path.join(CACHE_DIR, ".READCMD")
         
 
 def list_commands():
     return_to_menu = True
-    cmd_list = list(Path('cmddir').iterdir())
+    cmd_list = list(Path(DATA_DIR).iterdir())
 
-    lst2 = []
+    lst = []
     for i in range(0, len(cmd_list)):
 
+        # Expected format for cmd_file to be: /Users/USERNAME/.local/share/cmdbank/data/FILENAME
         cmd_file = str(cmd_list[i])
+        file_name = os.path.basename(cmd_file)
+        file_name_no_extension = os.path.splitext(file_name)[0]
+        lst.append(file_name_no_extension)
 
-        machine_OS = platform.system()
-        if machine_OS == "Windows":
-            slash_index = cmd_file.find("\\")
-        elif machine_OS == "Linux" or machine_OS == "Darwin":
-            slash_index = cmd_file.find("/")
-        else:
-            print("[red]ERROR - Unsupported OS[/red]")
-            return_to_menu = False
-        
-        dot_index = cmd_file.find(".")
+    lst = sorted(lst) # Sort list alphabetically
 
-        lst = []
-        for j in range(slash_index+1, dot_index):
-            lst.append(cmd_file[j])
-        
-        file_name = "".join(lst)
-        lst2.append(file_name)
-
-    lst2 = sorted(lst2) # Sort list alphabetically
-
-    return lst2, return_to_menu
+    return lst, return_to_menu
 
 
 def render_main_menu(stored_commands):
@@ -107,7 +95,7 @@ def add(stored_commands):
             print("[red]ERROR - File cannot have the same name as a menu option[/red]")
         else:
             cmd_file = cmd + ".txt"
-            path = Path.cwd().joinpath('cmddir', cmd_file)
+            path = Path.cwd().joinpath(DATA_DIR, cmd_file)
             open(path, "x")
             print(cmd, "has been added.")
     else:
@@ -119,7 +107,7 @@ def edit(stored_commands):
     cmd = input("> ")
     if cmd in stored_commands:
         cmd_file = cmd + ".txt"
-        path = Path.cwd().joinpath('cmddir', cmd_file)
+        path = Path.cwd().joinpath(DATA_DIR, cmd_file)
         if platform.system() == "Windows":
             run(["edit", path])
         if platform.system() == "Linux" or platform.system() == "Darwin":
@@ -134,10 +122,10 @@ def delete(stored_commands):
 
     if cmd in stored_commands:
         cmd_file = cmd + ".txt"
-        path = Path.cwd().joinpath('cmddir', cmd_file)
-        print("Are you sure you want to delete", cmd,"? (y/n)")
-        confirm = input("> ").lower()
-        if confirm == 'y' or confirm == 'yes':
+        path = Path.cwd().joinpath(DATA_DIR, cmd_file)
+        print("Are you sure you want to delete", cmd,"? (Y/N)")
+        confirm = input("> ").upper()
+        if confirm == 'Y' or confirm == 'YES':
             path.unlink()
         else:
             print("Delete cancelled...")
@@ -160,7 +148,7 @@ def view(s_c, u_i):
         if selection != 0 and selection <= len(stored_commands):
             selected_cmd = stored_commands[selection-1]
             cmd_file = selected_cmd + ".txt"
-            cmd_path = Path.cwd().joinpath('cmddir', cmd_file)
+            cmd_path = Path.cwd().joinpath(DATA_DIR, cmd_file)
 
     # If user input is a string
     except ValueError:
@@ -169,13 +157,13 @@ def view(s_c, u_i):
             if i == usr_input:
                 selected_cmd = i
                 cmd_file = i + ".txt"
-                cmd_path = Path.cwd().joinpath('cmddir', cmd_file)
+                cmd_path = Path.cwd().joinpath(DATA_DIR, cmd_file)
                 break
 
     # Format contents of command file to .READCMD
     cmd_num = 0
     try:
-        with open(".READCMD", "w") as f1:
+        with open(READCMD, "w") as f1:
             try:
                 with open(cmd_path, "r") as f2:
 
@@ -256,7 +244,7 @@ def copy_command(s_c, u_i):
         return True
         
     select = False
-    with open(".READCMD", "r") as f1:
+    with open(READCMD, "r") as f1:
 
         # Iterates through all lines in .READCMD
         for l in f1:
@@ -307,8 +295,6 @@ def ui_menu():
 
 
 def main():
-    check_cmddir()
-
     try:
         ui_menu()
     except KeyboardInterrupt:
