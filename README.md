@@ -5,8 +5,14 @@
 
 # CMD-BANK
 
-CMD-BANK is a CLI app that lets you save and retreive your favourite commands directly from the terminal.<br>
+CMD-BANK is a CLI app that lets you save and retrieve your favourite commands directly from the terminal.<br>
 No more jumping back and forth between your shell and scattered notes to find commands!
+
+Install with `pipx install https://github.com/NateHartley/CMD-BANK/archive/refs/tags/v1.0.0.tar.gz`
+
+Uninstall with `pipx uninstall cmdbank`
+
+# Dev Environment
 
 ### Initialise venv on local machine
 1. Clone repo `git clone https://github.com/NateHartley/CMD-BANK.git`
