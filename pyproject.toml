@@ -1,0 +1,16 @@
+[project]
+name = "cmdbank"
+version = "1.0.0"
+readme = "README.md"
+
+dependencies = [
+    "markdown-it-py==4.0.0",
+    "mdurl==0.1.2",
+    "platformdirs==4.9.4",
+    "Pygments==2.19.2",
+    "pyperclip==1.11.0",
+    "rich==14.3.2"
+]
+
+[project.scripts]
+cmdbank = "cmdbank.main:main"
