@@ -9,13 +9,7 @@ from rich.table import Table
 from rich.columns import Columns
 from rich.text import Text
 import os
-
-APP_NAME = "cmdbank"
-HOME_DIR = os.path.expanduser("~")
-DATA_DIR = os.path.join(HOME_DIR, ".local", "share", APP_NAME, "data")
-CACHE_DIR = os.path.join(HOME_DIR, ".cache", APP_NAME)
-READCMD = os.path.join(CACHE_DIR, ".READCMD")
-        
+from .paths import init_paths, DATA_DIR, READCMD        
 
 def list_commands():
     return_to_menu = True
@@ -23,8 +17,6 @@ def list_commands():
 
     lst = []
     for i in range(0, len(cmd_list)):
-
-        # Expected format for cmd_file to be: /Users/USERNAME/.local/share/cmdbank/data/FILENAME
         cmd_file = str(cmd_list[i])
         file_name = os.path.basename(cmd_file)
         file_name_no_extension = os.path.splitext(file_name)[0]
@@ -295,6 +287,7 @@ def ui_menu():
 
 
 def main():
+    init_paths()
     try:
         ui_menu()
     except KeyboardInterrupt:
