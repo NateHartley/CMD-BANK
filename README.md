@@ -47,7 +47,6 @@ When running the app for the first time, this is what your terminal will look li
 
 - The left panel titled "View Saved Commands" displays all files you've created inside the app. <br>
 - The right panel titled "Menu Options" displays all available options with the key (e.g. `a)`) and option label (e.g. `add`).<br>
-<br>
 
 Text files must be created inside of CMD-BANK to house your commands. It is recommended to name a file after as a base command (e.g. `nmap`) and store all variations of that base command within the file.
 
@@ -63,8 +62,6 @@ This is what my `hydra` file looks like after I've added some commands:
 - Each command is automatically numbered in ascending order. The numbering is highlighted in yellow.
 - The command is displayed after the numbering on the same line and highlighted in blue.
 - Any comments are displayed underneath in off-white italics.
-<br>
-<br>
 
 When adding commands to a file, it should follow this structure:
 <img src="images/editing_file.png" /><br>
@@ -87,7 +84,7 @@ macOS: _/Users/&lt;USERNAME>/Library/Application Support/cmdbank/Data/_
 **config.toml** - Stores app settings. (Not deleted during uninstallation)<br>
 macOS: _/Users/&lt;USERNAME>/Library/Application Support/cmdbank/config.toml_
 
-**.READCMD** - Stores selected command. (Not deleted during uninstallation)<br>
+**.READCMD** - Stores commands from selected file. (Not deleted during uninstallation)<br>
 macOS: _/Users/&lt;USERNAME>/Library/Caches/cmdbank/.READCMD_
 
 **cmdbank** - Executes application when `cmdbank` is run.<br>
