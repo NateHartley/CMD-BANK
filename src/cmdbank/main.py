@@ -1,269 +1,17 @@
 #!/usr/bin/env python3
-from pathlib import Path
-from subprocess import run
-import pyperclip, sys, platform
-from rich import print
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.columns import Columns
-from rich.text import Text
-import os
-from .paths import init_paths, DATA_DIR, READCMD        
-
-def list_commands():
-    return_to_menu = True
-    cmd_list = list(Path(DATA_DIR).iterdir())
-
-    lst = []
-    for i in range(0, len(cmd_list)):
-        cmd_file = str(cmd_list[i])
-        file_name = os.path.basename(cmd_file)
-        file_name_no_extension = os.path.splitext(file_name)[0]
-        lst.append(file_name_no_extension)
-
-    lst = sorted(lst) # Sort list alphabetically
-
-    return lst, return_to_menu
-
-
-def render_main_menu(stored_commands):
-    console = Console()
-
-    # View Saved Commands column
-    table1 = Table(show_header=False, box=None, pad_edge=False)
-    table1.add_column("No.", style="green", width=2, justify="right")
-    table1.add_column("Option", style="cyan")
-
-    if not stored_commands:
-        table1.add_row("", "[red](Directory is empty)[/red]")
-    else:
-        for i, opt in enumerate(stored_commands, start=1):
-            table1.add_row(str(i)+")", opt)
-
-    # Menu Options column
-    table2 = Table(show_header=False, box=None, pad_edge=False)
-    table2.add_column("Option")
-    table2.add_row("[green]a)[/green] add")
-    table2.add_row("[green]e)[/green] edit")
-    table2.add_row("[green]d)[/green] delete")
-    table2.add_row("[green]q)[/green] quit")
-
-    # Panels inside of main box
-    columns = Columns(
-        [
-            Panel(table1, title="View Saved Commands", padding=(1,4)), # Don't set to white bc of light theme
-            Panel(table2, title="Menu Options", padding=(1,4)),
-        ],
-        equal=False,
-        expand=True,
-    )
-
-    # Main box
-    console.print(
-        Panel(
-            columns,
-            title="[bold]CMD-BANK[/bold]",
-            border_style="green",
-            padding=(0, 1),
-        )
-    )
-
-
-def add(stored_commands):
-    print("Enter the name of a file to add:")
-    cmd = input("> ")
-    invalid_char = ['.', ',', '/', '\\', ' ']
-
-    if cmd.isnumeric() == False:
-        for i in cmd:
-            if i in invalid_char:
-                print("[red]ERROR - File name cannot include the following characters: . , / \\ (space)[/red]")
-                return
-        
-        if cmd in stored_commands:
-            print("[red]ERROR - This file already exists[/red]")
-        elif cmd == 'a' or cmd == 'e' or cmd == 'd' or cmd == 'q':
-            print("[red]ERROR - File cannot have the same name as a menu option[/red]")
-        else:
-            cmd_file = cmd + ".txt"
-            path = Path.cwd().joinpath(DATA_DIR, cmd_file)
-            open(path, "x")
-            print(cmd, "has been added.")
-    else:
-        print("[red]ERROR - File name cannot be an integer[/red]")
-
-
-def edit(stored_commands):
-    print("Enter the name of a file to edit:")
-    cmd = input("> ")
-    if cmd in stored_commands:
-        cmd_file = cmd + ".txt"
-        path = Path.cwd().joinpath(DATA_DIR, cmd_file)
-        if platform.system() == "Windows":
-            run(["edit", path])
-        if platform.system() == "Linux" or platform.system() == "Darwin":
-            run(["nano", path])
-    else:
-        print("[red]ERROR - This file does not exist[/red]")
-
-
-def delete(stored_commands):
-    print("Enter the name of a file to delete:")
-    cmd = input("> ")
-
-    if cmd in stored_commands:
-        cmd_file = cmd + ".txt"
-        path = Path.cwd().joinpath(DATA_DIR, cmd_file)
-        print("Are you sure you want to delete", cmd,"? (Y/N)")
-        confirm = input("> ").upper()
-        if confirm == 'Y' or confirm == 'YES':
-            path.unlink()
-        else:
-            print("Delete cancelled...")
-    else:
-        print("[red]ERROR - This file does not exist[/red]")
-
-
-def view(s_c, u_i):
-    stored_commands = s_c
-    usr_input = u_i
-
-    console = Console()
-    text = Text()
-
-    # If user input is an integer
-    try:
-        selection = int(usr_input)
-
-        # Error handling if user input is 0 or too high
-        if selection != 0 and selection <= len(stored_commands):
-            selected_cmd = stored_commands[selection-1]
-            cmd_file = selected_cmd + ".txt"
-            cmd_path = Path.cwd().joinpath(DATA_DIR, cmd_file)
-
-    # If user input is a string
-    except ValueError:
-        i = 0
-        for i in stored_commands:
-            if i == usr_input:
-                selected_cmd = i
-                cmd_file = i + ".txt"
-                cmd_path = Path.cwd().joinpath(DATA_DIR, cmd_file)
-                break
-
-    # Format contents of command file to .READCMD
-    cmd_num = 0
-    try:
-        with open(READCMD, "w") as f1:
-            try:
-                with open(cmd_path, "r") as f2:
-
-                    if cmd_path.stat().st_size == 0:
-                        text.append("(File is empty)\n\n", style="red")
-                    else:
-                        previous_line = " "
-                        for l in f2:
-
-                            # If line is not blank, no else statement so ignoring all blank lines
-                            if l.strip():
-
-                                # If reading the info line
-                                if l[0] == "#":
-                                    info = l[1:].strip()
-                                    text.append(info+"\n\n", style="italic")
-
-                                # If reading the command line
-                                else:
-
-                                    # If two commands next to each other, no space in between them
-                                    if previous_line[0] != "#" and previous_line != " ":
-                                        text.append("\n")
-
-                                    cmd_num += 1
-                                    number = "["+str(cmd_num)+"]"
-
-                                    f1.write("%d\n" % cmd_num)
-                                    f1.write(l + "\n")
-
-                                    command = l.rstrip()
-                                    text.append(number, style="yellow")
-                                    text.append(" ")
-                                    text.append(command+"\n", style="cyan")
-                        
-                                previous_line = l
-
-                # Back option
-                if cmd_path.stat().st_size != 0:
-                    if previous_line[0] != "#":
-                        text.append("\nb)", style="green")
-                    else:
-                        text.append("b)", style="green")
-                else:
-                    text.append("b)", style="green")
-                text.append(" ")
-                text.append("back", style="white")
-
-                console.print(
-                    Panel(
-                        text,
-                        title="[bold]"+selected_cmd+"[/bold]",
-                        border_style="green",
-                    )
-                )
-
-            # User inputted '0' therefore cmd_path is not set, triggering UnboundLocalError
-            except UnboundLocalError:
-                print(f"[red]ERROR - Invalid input. This is not a saved command, or a menu option. Please try again[/red]")
-                return True
-            except:
-                print("[red]ERROR - Could not read[/red]", cmd_path)
-                return False
-    except:
-        print("[red]ERROR - Could not read .READCMD[/red]")
-        return False
-    
-    return copy_command(stored_commands, usr_input)
-    
-def copy_command(s_c, u_i):
-    stored_commands = s_c
-    usr_input = u_i
-
-    cmd_choice = input("\n> ")
-
-    # Return to main menu if back option is selected
-    if cmd_choice == "b":
-        return True
-        
-    select = False
-    with open(READCMD, "r") as f1:
-
-        # Iterates through all lines in .READCMD
-        for l in f1:
-            if select:
-                select = False
-                saved_cmd = l.strip()
-
-            if l.strip() == cmd_choice:
-                select = True
-            else:
-                pass
-
-    try:
-        pyperclip.copy(saved_cmd)
-        print("Command has been copied to you clipboard!")
-        return False
-    except:
-        print("[red]ERROR - Invalid input. This is not a saved command, or a menu option. Please try again[/red]")
-        return view(stored_commands, usr_input)
-
+import sys
+from .paths import init_paths, DATA_DIR, READCMD     
+from .render import main_menu as render_main_menu
+from .errors import *
+from .actions import add, edit, delete, view
+from .utils import list_command_files
 
 def ui_menu():
     return_to_menu = True
     menu_options = ['a', 'e', 'd', 'q']
 
     while return_to_menu:
-        stored_commands, return_to_menu = list_commands()
+        stored_commands, return_to_menu = list_command_files()
         render_main_menu(stored_commands)
         usr_input = input("\n> ")
         print("")
@@ -282,18 +30,16 @@ def ui_menu():
             else:
                 return_to_menu = view(stored_commands, usr_input)
         except KeyboardInterrupt:
-            print("\n[red]Keyboard Interrupt - No command saved to clipboard[/red]")
+            error_keyboard_interrupt()
             sys.exit()
-
 
 def main():
     init_paths()
     try:
         ui_menu()
     except KeyboardInterrupt:
-        print("\n[red]Keyboard Interrupt - No command saved to clipboard[/red]")
+        error_keyboard_interrupt()
         sys.exit()
     
-
 if __name__ == "__main__":
     main()
