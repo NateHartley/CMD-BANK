@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import sys
-from .paths import init_paths, DATA_DIR, READCMD     
+from .paths import init_paths
 from .render import main_menu as render_main_menu
-from .errors import *
 from .actions import add, edit, delete, view
+from .errors import *
 from .utils import *
 
 ### Executes main menu actions (add, edit, delete, quit, view command file) based on user input, and invokes rendering
