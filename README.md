@@ -1,6 +1,6 @@
 ![Usability](https://img.shields.io/badge/Free_to_use-blue)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen) 
-![Version](https://img.shields.io/badge/version-1.0.0-brightgreen)
+![Version](https://img.shields.io/badge/version-1.0.1-brightgreen)
 
 <img src="images/logo.png" alt="CMD-BANK" width="120px"/>
 
@@ -18,7 +18,7 @@ CMD-BANK is a command line application that allows you to save and retrieve your
 
 ### Install with pipx:
 ```
-pipx install https://github.com/NateHartley/CMD-BANK/archive/refs/tags/v1.0.0.tar.gz
+pipx install https://github.com/NateHartley/CMD-BANK/archive/refs/tags/v1.0.1.tar.gz
 ```
 
 ### Install from source code:
@@ -60,8 +60,8 @@ This is what my `hydra` file looks like after I've added some commands:
 <img src="images/filled_file.png" /><br>
 
 - Each command is automatically numbered in ascending order. The numbering is highlighted in yellow.
-- The command is displayed after the numbering on the same line and highlighted in blue.
-- Any comments are displayed underneath in off-white italics.
+- The command is displayed after the numbering on the same line and highlighted in cyan.
+- Any comments are displayed underneath in light grey italics.
 
 When adding commands to a file, it should follow this structure:
 <img src="images/editing_file.png" /><br>
