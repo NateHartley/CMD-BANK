@@ -9,7 +9,7 @@ CONFIG_DIR = Path(user_config_dir(APP_NAME))
 CONFIG = CONFIG_DIR / "config.toml"
 
 DEFAULT_CONFIG_DATA = """
-copy_command_to_clipboard = false
+copy_command_to_clipboard = true
 sort_files_alphabetically = true
 """
 
