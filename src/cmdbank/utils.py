@@ -1,10 +1,12 @@
 import pyperclip, os
 from pathlib import Path
-from .paths import READCMD, DATA_DIR
+from .paths import READCMD, DATA_DIR, CONFIG
 from .errors import *
+from time import sleep
 
-### Copies user selected command from current command file
-def copy_command():
+### Copies user selected command from current command file, 
+### or will run the command directly then return to CMD-BANK depending on user's settings
+def copy_run_command():
     cmd_choice = get_user_input()
     # User inputted an integer
     try:
@@ -13,17 +15,27 @@ def copy_command():
         # If integer is out of range, jump to except clause
         if selected_cmd == None:
             raise ValueError
-        pyperclip.copy(selected_cmd) #TODO: Include option to save to clipboard or run directly with os.system(saved_cmd)
-        print("Command has been copied to you clipboard!")
-        return False, None
+
+        # If user sets copy_command_to_clipboard to true, copy to clipboard, else run command directly
+        copy_to_clipboard = get_setting_in_config("copy_command_to_clipboard")
+        if copy_to_clipboard == True:
+            pyperclip.copy(selected_cmd)
+            print("Command has been copied to you clipboard!")
+        elif copy_to_clipboard == False:
+            print("Running command...")
+            os.system(selected_cmd)
+            sleep(0.3) # Small delay between running command and returning to command file for readability
+            return False, True
+
+        return False, False
         
     # User inputted a string, return to main menu if back option is selected
     except ValueError:
         if cmd_choice == "b":
-            return True, None
+            return True, False
         else:
             error_input_invalid()
-            return None, True
+            return False, True
         
 ### Matches command number with user input from .READCMD,
 ### Returns selected command
@@ -45,16 +57,13 @@ def get_selected_command(cmd_choice):
 def list_command_files():
     return_to_menu = True
     cmd_list = list(Path(DATA_DIR).iterdir())
-
     lst = []
     for i in range(0, len(cmd_list)):
         cmd_file = str(cmd_list[i])
         file_name = os.path.basename(cmd_file)
         file_name_no_extension = os.path.splitext(file_name)[0]
         lst.append(file_name_no_extension)
-
     lst = sorted(lst) # Sorts list alphabetically
-
     return lst, return_to_menu
 
 ### Gets path to command file from user selection and returns path
@@ -90,3 +99,21 @@ def is_valid_file_name(file_name, stored_commands):
     else:
         error_file_invalid_int()
         return False
+    
+def get_setting_in_config(chosen_setting):
+    matching_setting = False
+    with open(CONFIG, "r") as config_file:
+        for line in config_file:
+            if line != "\n":
+                if line.split()[0] == chosen_setting:
+                    matching_setting = True
+                    if line.split()[-1] == "true":
+                        return True
+                    elif line.split()[-1] == "false":
+                        return False
+                    else:
+                        error_read_CONFIG_bool(chosen_setting)
+                        return None
+        if not matching_setting:
+            error_read_CONFIG_flag(chosen_setting)
+            return None
