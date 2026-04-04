@@ -72,7 +72,7 @@ def view(stored_commands, usr_input):
         except:
             error_read_READCMD()
             return False
-        return_to_menu, return_to_command_file = copy_command()
+        return_to_menu, return_to_command_file = copy_run_command()
     return return_to_menu
 
 ### Handles user input when selecting a command file to view, 
