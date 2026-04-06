@@ -31,11 +31,19 @@ def copy_run_command():
         
     # User inputted a string, return to main menu if back option is selected
     except ValueError:
+        #TODO: replace with back_option()
         if cmd_choice == "b":
             return True, False
         else:
-            error_input_invalid()
+            error_input_invalid_command()
             return False, True
+        
+### Returns true if back option is selected when viewing a command file or the settings menu, this will regenerate the main menu
+def back_option(usr_input):
+    if usr_input == "b":
+        return True, False
+    else:
+        return False, True
         
 ### Matches command number with user input from .READCMD,
 ### Returns selected command
@@ -53,9 +61,9 @@ def get_selected_command(cmd_choice):
     return selected_cmd
 
 ### Compiles list of command files,
-### returns list, and return_to_menu bool
+### returns list, and return_to_main_menu bool
 def list_command_files():
-    return_to_menu = True
+    return_to_main_menu = True
     cmd_list = list(Path(DATA_DIR).iterdir())
     lst = []
     for i in range(0, len(cmd_list)):
@@ -64,7 +72,7 @@ def list_command_files():
         file_name_no_extension = os.path.splitext(file_name)[0]
         lst.append(file_name_no_extension)
     lst = sorted(lst) # Sorts list alphabetically
-    return lst, return_to_menu
+    return lst, return_to_main_menu
 
 ### Gets path to command file from user selection and returns path
 def get_command_file_path(selected_cmd_file):
@@ -79,7 +87,7 @@ def get_user_input():
 
 ### Determines if a user inputted file name is valid or not,
 ### returns true or false
-def is_valid_file_name(file_name, stored_commands):
+def is_valid_file_name(file_name, stored_commands, menu_options):
     invalid_char = ['.', ',', '/', '\\', ' ']
 
     if file_name.isnumeric() == False:
@@ -88,10 +96,13 @@ def is_valid_file_name(file_name, stored_commands):
                 error_file_invalid_char()
                 return False
         
-        if file_name in stored_commands:
-            error_file_already_exists()
-            return False
-        elif file_name == 'a' or file_name == 'e' or file_name == 'd' or file_name == 'q':
+        for stored_command in stored_commands:
+            if file_name.lower() == stored_command.lower():
+                error_file_already_exists()
+                return False
+        
+        if file_name in menu_options:
+        # elif file_name == 'a' or file_name == 'e' or file_name == 'd' or file_name == 'q':
             error_file_menu_option()
             return False
         else:
@@ -100,11 +111,14 @@ def is_valid_file_name(file_name, stored_commands):
         error_file_invalid_int()
         return False
     
+### Takes in a particular setting option e.g. "copy_command_to_clipboard", matches that string with corresponding setting in config.toml,
+### returns True if setting is set to true, False if false, and None if there's a read error
 def get_setting_in_config(chosen_setting):
     matching_setting = False
     with open(CONFIG, "r") as config_file:
         for line in config_file:
-            if line != "\n":
+            # Skip first blank line of config.toml
+            if line.strip():
                 if line.split()[0] == chosen_setting:
                     matching_setting = True
                     if line.split()[-1] == "true":
@@ -117,3 +131,15 @@ def get_setting_in_config(chosen_setting):
         if not matching_setting:
             error_read_CONFIG_flag(chosen_setting)
             return None
+
+### Returns list of all settings in config.toml, including setting names and assigned bools
+def list_config_settings():
+    settings_list = []
+    with open(CONFIG, "r") as config_file:
+        for line in config_file:
+            # Skip first blank line of config.toml
+            if line.strip():
+                # Doesn't add "=" to list
+                setting = [i for i in line.split() if i != "="]
+                settings_list.append(setting)
+    return settings_list
