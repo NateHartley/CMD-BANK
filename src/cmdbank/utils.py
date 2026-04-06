@@ -71,7 +71,7 @@ def list_command_files():
         file_name = os.path.basename(cmd_file)
         file_name_no_extension = os.path.splitext(file_name)[0]
         lst.append(file_name_no_extension)
-    lst = sorted(lst) # Sorts list alphabetically
+    lst = sorted(lst) #TODO: Sorts list alphabetically - activate with settings option
     return lst, return_to_main_menu
 
 ### Gets path to command file from user selection and returns path
@@ -102,7 +102,6 @@ def is_valid_file_name(file_name, stored_commands, menu_options):
                 return False
         
         if file_name in menu_options:
-        # elif file_name == 'a' or file_name == 'e' or file_name == 'd' or file_name == 'q':
             error_file_menu_option()
             return False
         else:
