@@ -2,7 +2,7 @@ from rich import print
 
 # Interrupt errors
 def error_keyboard_interrupt():
-    print("\n[red]Keyboard Interrupt - No command saved to clipboard[/red]")
+    print("\n[red]Keyboard Interrupt - CMD-BANK quit[/red]")
 
 # File errors
 def error_file_invalid_char():
@@ -21,8 +21,11 @@ def error_file_menu_option():
     print("[red]ERROR - File cannot have the same name as a menu option[/red]")
 
 # Input errors
-def error_input_invalid():
+def error_input_invalid_command():
     print("[red]ERROR - Invalid input. This is not a saved command, or a menu option. Please try again[/red]")
+
+def error_input_invalid_setting():
+    print("[red]ERROR - Invalid input. This is not a settings option, or a menu option. Please try again[/red]")
 
 # Read errors
 def error_read_file_path(cmd_path):
