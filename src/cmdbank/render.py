@@ -24,6 +24,7 @@ def main_menu(stored_commands):
     MO_table.add_row("[green]a)[/green] add")
     MO_table.add_row("[green]e)[/green] edit")
     MO_table.add_row("[green]d)[/green] delete")
+    MO_table.add_row("[green]s)[/green] settings")
     MO_table.add_row("[green]q)[/green] quit")
 
     # Panels inside of main box
@@ -76,8 +77,9 @@ def command_file_content(text, cmd_path, f1, f2):
     else:
         text.append("(File is empty)\n\n", style="red")
 
-### Renders the structure of the command file, including main file outline box, and back option
-def command_file_structure(console, text, cmd_path, previous_line, selected_cmd_file):
+### Renders the structure of the command file, including main outline box and back option
+def command_file_structure(text, cmd_path, previous_line, selected_cmd_file):
+    console = Console()
     # Back option
     if cmd_path.stat().st_size != 0:
         if previous_line[0] != "#":
@@ -94,5 +96,44 @@ def command_file_structure(console, text, cmd_path, previous_line, selected_cmd_
             text,
             title="[bold]"+selected_cmd_file+"[/bold]",
             border_style="green",
+        )
+    )
+
+### Renders the content of the settings menu, including settings numbering, settings name, ENABLED/DISABLED, setting description
+def settings_menu_content(text, settings_list):
+    settings_num = 0
+    for i in range(len(settings_list)):
+        setting_bool = settings_list[i][1]
+        if setting_bool == "true":
+            text.append("[ENABLED]\n", style="bold green")
+        else:
+            text.append("[DISABLED]\n", style="bold red")
+
+        settings_num += 1
+        number = "["+str(settings_num)+"]"
+        text.append(number, style="yellow")
+        text.append(" ")
+
+        setting_name = settings_list[i][0]
+        if setting_name == "copy_command_to_clipboard":
+            text.append("Copy command\n", style="cyan")
+            text.append("When ENABLED, copy selected command to clipboard. When DISABLED, run selected command in terminal.\n\n", style="italic")
+        if setting_name == "sort_files_alphabetically":
+            text.append("Sort files alphabetically\n", style="cyan")
+            text.append("When ENABLED, command files are displayed alphabetically. When DISABLED, command files are displayed in order of creation.\n\n", style="italic")
+
+### Renders the structure of the settings menu, including main outline box and back option
+def settings_menu_structure(text):
+    console = Console()
+    text.append("b)", style="green")
+    text.append(" ")
+    text.append("back", style="white")
+
+    console.print(
+        Panel(
+            text,
+            title="[bold]Settings[/bold]",
+            border_style="green",
+            padding=(0, 1),
         )
     )
