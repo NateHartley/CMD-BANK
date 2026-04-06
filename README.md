@@ -61,7 +61,7 @@ This is what my `hydra` file looks like after I've added some commands:
 
 - Each command is automatically numbered in ascending order. The numbering is highlighted in yellow.
 - The command is displayed after the numbering on the same line and highlighted in cyan.
-- Any comments are displayed underneath in light grey italics.
+- Any comments are displayed underneath in italics.
 
 When adding commands to a file, it should follow this structure:
 <img src="images/editing_file.png" /><br>
