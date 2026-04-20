@@ -2,6 +2,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.columns import Columns
+from .utils import *
 
 ### Renders main menu, including main menu outline box, "View Saved Commands" column, and "Menu Options" column
 def main_menu(stored_commands):
@@ -13,8 +14,16 @@ def main_menu(stored_commands):
     VSC_table.add_column("Option", style="cyan")
 
     if stored_commands:
-        for i, opt in enumerate(stored_commands, start=1):
-            VSC_table.add_row(str(i)+")", opt)
+        # If user sets sort_files_alphabetically to true, display files alphabetically, else display most recently modified first
+        sort_files_setting = get_setting_in_config("sort_files_alphabetically")
+        if sort_files_setting:
+            stored_commands.sort()
+            for i, opt in enumerate(stored_commands, start=1): # enumerate returns the current index and item
+                VSC_table.add_row(str(i)+")", opt)
+        else:
+            mod_cmd_lst = get_recently_modified_files()
+            for i, opt in enumerate(mod_cmd_lst, start=1):
+                VSC_table.add_row(str(i)+")", opt)
     else:
         VSC_table.add_row("", "[red](Directory is empty)[/red]")
 
@@ -120,7 +129,7 @@ def settings_menu_content(text, settings_list):
             text.append("When ENABLED, copy selected command to clipboard. When DISABLED, run selected command in terminal.\n\n", style="italic")
         if setting_name == "sort_files_alphabetically":
             text.append("Sort files alphabetically\n", style="cyan")
-            text.append("When ENABLED, command files are displayed alphabetically. When DISABLED, command files are displayed in order of creation.\n\n", style="italic")
+            text.append("When ENABLED, command files are displayed alphabetically. When DISABLED, most recently modified command files are displayed first.\n\n", style="italic")
 
 ### Renders the structure of the settings menu, including main outline box and back option
 def settings_menu_structure(text):
