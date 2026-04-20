@@ -17,11 +17,11 @@ def copy_run_command():
             raise ValueError
 
         # If user sets copy_command_to_clipboard to true, copy to clipboard, else run command directly
-        copy_to_clipboard = get_setting_in_config("copy_command_to_clipboard")
-        if copy_to_clipboard == True:
+        copy_to_clipboard_setting = get_setting_in_config("copy_command_to_clipboard")
+        if copy_to_clipboard_setting == True:
             pyperclip.copy(selected_cmd)
             print("Command has been copied to you clipboard!")
-        elif copy_to_clipboard == False:
+        elif copy_to_clipboard_setting == False:
             print("Running command...")
             os.system(selected_cmd)
             sleep(0.3) # Small delay between running command and returning to command file for readability
@@ -142,3 +142,25 @@ def list_config_settings():
                 setting = [i for i in line.split() if i != "="]
                 settings_list.append(setting)
     return settings_list
+
+### Returns list of all command files ordered by most recent modification date/time
+def get_recently_modified_files():
+    lst, _ = list_command_files()
+    mod_time_lst = []
+
+    for i in lst:
+        file_path = get_command_file_path(i)
+        mod_time = Path(file_path).stat().st_mtime
+        mod_time_lst.append(mod_time)
+
+    mod_time_lst.sort(reverse=True) # Most recently modified file time at the beginning of the list
+
+    mod_cmd_lst = []
+    for j in mod_time_lst:
+        for k in lst:
+            file_path = get_command_file_path(k)
+            mod_time = Path(file_path).stat().st_mtime
+            if j == mod_time:
+                mod_cmd_lst.append(k)
+
+    return mod_cmd_lst
