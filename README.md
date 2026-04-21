@@ -18,13 +18,14 @@ CMD-BANK is a command line application that allows you to save and retrieve your
 
 ### Install with pipx:
 ```
-pipx install https://github.com/NateHartley/CMD-BANK/archive/refs/tags/v1.0.1.tar.gz
+pipx install https://github.com/NateHartley/CMD-BANK/archive/refs/tags/v1.0.1.zip
 ```
 
 ### Install from source code:
 ```
-git clone https://github.com/NateHartley/CMD-BANK.git
-cd <PATH>/CMD-BANK
+wget https://github.com/NateHartley/CMD-BANK/archive/refs/tags/v1.0.1.zip -O CMD-BANK.zip
+unzip CMD-BANK.zip
+cd <PATH>/CMD-BANK-1.0.1
 pipx install -e .
 ```
 
@@ -39,8 +40,12 @@ pipx uninstall cmdbank
 cmdbank
 ```
 <br>
-(Colours and saturations may be different depending on your shell's config)<br>
+To retrieve a saved command, run the app and enter a file, then select your chosen command. This will either run the command directly, or copy it to your clipboard depending on your settings. <br>
+
 <br>
+
+> [!NOTE]
+> Colours and saturations may be different depending on your shell's config.
 
 When running the app for the first time, this is what your terminal will look like:<br>
 <img src="images/empty_dir.png" /><br>
@@ -48,7 +53,7 @@ When running the app for the first time, this is what your terminal will look li
 - The left panel titled "View Saved Commands" displays all files you've created inside the app. <br>
 - The right panel titled "Menu Options" displays all available options with the key (e.g. `a)`) and option label (e.g. `add`).<br>
 
-Text files must be created inside of CMD-BANK to house your commands. It is recommended to name a file after as a base command (e.g. `nmap`) and store all variations of that base command within the file.
+Text files must be created inside of CMD-BANK to house your commands. It is recommended to name a file after a base command (e.g. `nmap`) and store all variations of that command within the file.
 
 Here I've added some files in CMD-BANK as an example:
 <img src="images/filled_dir.png" /><br>
@@ -71,8 +76,6 @@ When adding commands to a file, it should follow this structure:
 - A hashtag (`#`) denotes the start of a comment, similar to Python notation.
 - Comments are optional and should be added underneath a command on a new line. Comments and commands should not occupy the same line.
 - Each command in a file is automatically numbered when viewing the file. Numbering should not be added manually.
-
-To retrieve a saved command, enter a file, then type in the number of your chosen command. This will either run the command directly, or copy the command to your clipboard depending on your config.
 <br>
 
 ## What is being installed and where?
