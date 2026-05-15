@@ -112,10 +112,10 @@ def command_file_structure(text, cmd_path, previous_line, selected_cmd_file):
 def settings_menu_content(text, settings_list):
     settings_num = 0
     for i in range(len(settings_list)):
-        setting_bool = settings_list[i][1]
-        if setting_bool == "true":
+        setting_value = settings_list[i][1]
+        if setting_value == "true":
             text.append("[ENABLED]\n", style="bold green")
-        else:
+        elif setting_value == "false":
             text.append("[DISABLED]\n", style="bold red")
 
         settings_num += 1
@@ -127,7 +127,7 @@ def settings_menu_content(text, settings_list):
         if setting_name == "copy_command_to_clipboard":
             text.append("Copy command\n", style="cyan")
             text.append("When ENABLED, copy selected command to clipboard. When DISABLED, run selected command in terminal.\n\n", style="italic")
-        if setting_name == "sort_files_alphabetically":
+        elif setting_name == "sort_files_alphabetically":
             text.append("Sort files alphabetically\n", style="cyan")
             text.append("When ENABLED, command files are displayed alphabetically. When DISABLED, most recently modified command files are displayed first.\n\n", style="italic")
 

@@ -35,7 +35,7 @@ def error_read_READCMD():
     print("[red]ERROR - Could not read .READCMD[/red]")
 
 def error_read_CONFIG_flag(setting):
-    print("[red]ERROR - Could not read[/red]", setting, "[red]in config.toml. Setting doesn't exist.[/red]")
+    print("[red]ERROR - Could not read[/red]", setting, "[red]in config.toml. Setting doesn't exist[/red]")
 
 def error_read_CONFIG_bool(setting):
-    print("[red]ERROR - Could not read bool assigned to[/red]", setting, "[red]in config.toml. It is neither true or false.[/red]")
+    print("[red]ERROR - Could not read bool assigned to[/red]", setting, "[red]in config.toml. It is neither true or false[/red]")
