@@ -1,6 +1,6 @@
 ![Usability](https://img.shields.io/badge/Free_to_use-blue)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen) 
-![Version](https://img.shields.io/badge/version-1.0.1-brightgreen)
+![Version](https://img.shields.io/badge/version-1.1.0-brightgreen)
 
 <img src="images/logo.png" alt="CMD-BANK" width="120px"/>
 
@@ -18,14 +18,14 @@ CMD-BANK is a command line application that allows you to save and retrieve your
 
 ### Install with pipx:
 ```
-pipx install https://github.com/NateHartley/CMD-BANK/archive/refs/tags/v1.0.1.zip
+pipx install https://github.com/NateHartley/CMD-BANK/archive/refs/tags/v1.1.0.zip
 ```
 
 ### Install from source code:
 ```
-wget https://github.com/NateHartley/CMD-BANK/archive/refs/tags/v1.0.1.zip -O CMD-BANK.zip
+wget https://github.com/NateHartley/CMD-BANK/archive/refs/tags/v1.1.0.zip -O CMD-BANK.zip
 unzip CMD-BANK.zip
-cd <PATH>/CMD-BANK-1.0.1
+cd <PATH>/CMD-BANK-1.1.0
 pipx install -e .
 ```
 
