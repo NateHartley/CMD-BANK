@@ -1,4 +1,5 @@
 import platform
+import os
 from subprocess import run
 from rich.text import Text
 from .errors import *
@@ -16,16 +17,18 @@ def add(stored_commands, menu_options):
         open(path, "x")
         print(file_name, "has been added.")
 
-### Edits content of selected command file
+### Edits content of selected command file with appropriate text editor
 def edit(stored_commands):
     print("Enter the name of a file to edit:")
     cmd = get_user_input()
     if cmd in stored_commands:
         path = get_command_file_path(cmd)
         if platform.system() == "Windows":
-            run(["edit", path])
+            text_editor = "edit"
         if platform.system() == "Linux" or platform.system() == "Darwin":
-            run(["nano", path])
+            # Use default nano text editor if $EDITOR var is not set
+            text_editor = os.environ.get("EDITOR") or "nano"
+        run([text_editor, path])
     else:
         error_file_doesnt_exist()
 
@@ -44,7 +47,7 @@ def delete(stored_commands):
     else:
         error_file_doesnt_exist()
 
-### Displays contents of selected command file and copies chosen command from command file,
+### Calls functions to render contents of selected command file and copies chosen command from command file,
 ### returns return_to_main_menu bool
 def view(stored_commands, usr_input):
     return_to_command_file = True
